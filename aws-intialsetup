@@ -1,0 +1,61 @@
+procedure :
+
+First  set up  the physical  environment  to build a Linux virtual server
+1) have a  account on aws  i created aws account  and login into console
+2) Launch Ec2 instance . i choose  Ubuntu Server 16.04 LTS (HVM), SSD Volume Type - ami-0c1e832407373333f   with the below configuration details
+Family : general purpose
+type  : t2.medium
+vCPUs : 2
+Memory(GiB)  : 4
+Instance Storage : EBS only
+Network performance. low to moderate
+ipv6 support :yes
+
+Add Storage :
+storage :  volume type :root
+device : /dev/sda1
+snapshot : snap-047a5d224a46c4b97
+size : 8 ,volume : general purpose SSD(gp2)
+IOPS : 100/3000
+
+Add tags : 
+Key : amazon key    value : amazonkey.pem
+
+configure security group :
+type : SSH
+protocol : TCP
+portrange : 22
+source : anywhere 
+inbound : ALL traffic
+out boud : ALL
+
+once i am done with Ec2 instance Launch i am going to build  linux  machine by using 
+Ansible ( configuration management tool)
+
+ For that i installed  the following Things
+On control Node or management Node ( Assume My Ec2 instance is my control node)
+  commands i used to install  python3-pip
+# sudo apt  update                     (update ubuntu before install )
+#sudo apt install python3-pip     ( install python3 )
+#pip3 install awscli                      (install awscli)
+# python3 --version                      ( to check python 3 is installed or not )
+# pip3 install ansible                    (install ansible)
+# ansible -- version                       ( to check ansible is installed or not )
+# pip3  install boto boto3               ( need both boto and boto3  to handle python with yaml)
+# key-generate                              ( generate keys to established connection between control                                                         node and mange node )
+
+#touch authorised_keys                  ( create authorised_keys)
+# chmod 600 authorised_keys          ( change permissions)
+
+# cat  id_rsa.pub >authorised_keys    ( add public key of control node  to authorised_keys)
+
+
+on manage node( local system)  :   install python  and generate keys 
+
+copy the public key of manage node and paste in the authorised_keys  of  control node.
+
+update the Host file :  
+goto  /etc/ansible/hosts    
+#vi /etc/ansible/hosts                 ( enter  ip address of manage node. )
+
+# ansible all -m ping           ( check the connection is established or not)
