@@ -1,0 +1,68 @@
+---
+ -hosts: localhost
+  connection: local
+  tasks:
+   -name: create resource group
+    aws_resourcegroup:
+      name:ansible_rg_test1
+      location: us-west-1c
+
+    -name: create virtual network
+     aws_virtualnetworl:
+     resource_group: ansible_rg_test1
+     address_prefixes: "10.0.0.0/24"
+
+    -name: create subnet in vnet
+     aws_subnet:
+      resource_group:ansinle_rg_test1
+      name:ansible-sub
+      address_prefix: "10.0.0.0/24"
+      virtual_network: ansible-vnet
+
+    -name: create public IP address
+      aws_publicipaddress:
+       resource-group: ansible_rg_test1
+       allocation_method: static
+       name: mypublicIP
+
+    -name: create network interface
+     aws_networkinterface:
+      name: "ansi-nic"
+      virtual_network_name: ansible-vnet
+      subnet_name: ansible-sub
+      public_ip_name: mypublicIP
+
+    -name: creating linux virtual meachine
+
+       resource_group: ansible_rg_test1
+       name:linuxvm
+       memory_size_gb: 2
+  users:
+    -
+      login: user1
+      ssh_key: "<./Downloads/amazon_key.pem> user1@localhost"
+      vcpu_count: 2
+  volumes:
+    -
+      device: /dev/xvda
+      mount: /
+      size_gb: 10
+      type: ext4
+    -
+      device: /dev/xvdf
+      mount: /data
+      size_gb: 100
+      type: xfs
+    network_interface: ans-nic
+     image
+     offer: linuxserver
+     version: latest
+
+
+
+import yaml
+
+config = {}
+with open("config.yaml",r) as stream:
+config=yaml.safe_load(stream)
+print(config ['success'])
